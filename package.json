@@ -17,6 +17,7 @@
   "devDependencies": {
     "@remix-run/node": "^2.9.0",
     "@remix-run/server-runtime": "^2.9.0",
+    "@remix-run/cloudflare": "^2.9.0",
     "@types/node": "^18.0.0",
     "ioredis": "^5.4.0",
     "remix": "^2.9.0",
