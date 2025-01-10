@@ -75,7 +75,7 @@ export function createRedisSessionStorage({
     async readData(id) {
       const data = await redis.get(id);
       if (data) {
-        return JSON.parse(data);
+        return options.cloudflare ? data : JSON.parse(data);
       }
       return null;
     },
