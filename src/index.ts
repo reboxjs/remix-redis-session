@@ -3,9 +3,9 @@ import {
   SessionStorage,
   createSessionStorageFactory,
 } from "@remix-run/server-runtime";
-import { createCookie } from "@remix-run/node";
-import crypto from "crypto"; // Correct way to import crypto in ESM
-
+import { createCookie as createNodeCookie } from "@remix-run/node";
+import { createCookie as createCloudflareCookie } from "@remix-run/cloudflare";
+import crypto from "node:crypto";
 import { Redis, RedisOptions } from "ioredis";
 
 function genRandomID(): string {
@@ -27,7 +27,8 @@ type redisSessionArguments = {
   cookie: SessionIdStorageStrategy["cookie"];
   options: {
     redisConfig?: RedisOptions;
-    redisClient?: Redis;
+    redisClient?: any;
+    cloudflare?: boolean;
   };
 };
 
@@ -36,7 +37,7 @@ export function createRedisSessionStorage({
   cookie,
   options,
 }: redisSessionArguments): SessionStorage {
-  let redis: Redis;
+  let redis: any;
   if (options.redisClient) {
     redis = options.redisClient;
   } else if (options.redisConfig) {
@@ -46,6 +47,9 @@ export function createRedisSessionStorage({
       "Need to provide either options.redisConfig or options.redisClient"
     );
   }
+
+  const createCookie = options.cloudflare ?
+    createCloudflareCookie: createNodeCookie;
 
   const createSessionStorage = createSessionStorageFactory(createCookie);
 
@@ -59,9 +63,9 @@ export function createRedisSessionStorage({
       if (expires) {
         await redis.set(
           key,
-          JSON.stringify(data),
-          "EX",
-          expiresToSeconds(expires)
+          JSON.stringify(data), {
+            ex: expiresToSeconds(expires),
+          },
         );
       } else {
         await redis.set(key, JSON.stringify(data));
@@ -71,7 +75,7 @@ export function createRedisSessionStorage({
     async readData(id) {
       const data = await redis.get(id);
       if (data) {
-        return JSON.parse(data);
+        return options.cloudflare ? data : JSON.parse(data);
       }
       return null;
     },
@@ -79,9 +83,9 @@ export function createRedisSessionStorage({
       if (expires) {
         await redis.set(
           id,
-          JSON.stringify(data),
-          "EX",
-          expiresToSeconds(expires)
+          JSON.stringify(data), {
+            ex: expiresToSeconds(expires),
+          },
         );
       } else {
         await redis.set(id, JSON.stringify(data));
