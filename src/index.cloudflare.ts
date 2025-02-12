@@ -6,7 +6,7 @@ import {
 import { createCookie } from "@remix-run/cloudflare";
 // Using the global Web Crypto API available in Cloudflare Workers; no need for node:crypto
 import { Redis } from "@upstash/redis";
-import { expiresToSeconds, formatKey } from "./common";
+import { expiresToSeconds, formatKey } from "./common.js";
 
 // Generates a random session ID using the Cloudflare global crypto API
 function genRandomID(): string {

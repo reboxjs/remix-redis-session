@@ -6,7 +6,7 @@ import {
 import { createCookie } from "@remix-run/node";
 import crypto from "node:crypto";
 import { Redis, RedisOptions } from "ioredis";
-import { expiresToSeconds, formatKey } from "./common";
+import { expiresToSeconds, formatKey } from "./common.js";
 
 // Generates a random session ID using Node's crypto
 function genRandomID(): string {
