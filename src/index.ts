@@ -4,7 +4,8 @@ import {
   createSessionStorageFactory,
 } from "@remix-run/server-runtime";
 import { createCookie as createNodeCookie } from "@remix-run/node";
-import { createCookie as createCloudflareCookie } from "@remix-run/cloudflare";
+// Removed static import for Cloudflare:
+// import { createCookie as createCloudflareCookie } from "@remix-run/cloudflare";
 import crypto from "node:crypto";
 import { Redis, RedisOptions } from "ioredis";
 
@@ -48,8 +49,11 @@ export function createRedisSessionStorage({
     );
   }
 
-  const createCookie = options.cloudflare ?
-    createCloudflareCookie: createNodeCookie;
+  // Conditionally require @remix-run/cloudflare only if needed
+  let createCookie = createNodeCookie;
+  if (options.cloudflare) {
+      createCookie = require("@remix-run/cloudflare").createCookie;
+  }
 
   const createSessionStorage = createSessionStorageFactory(createCookie);
 
@@ -59,7 +63,7 @@ export function createRedisSessionStorage({
     cookie,
     async createData(data, expires) {
       const id = genRandomID();
-      const key = formatKey(id)
+      const key = formatKey(id);
       if (expires) {
         await redis.set(
           key,
