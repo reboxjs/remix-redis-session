@@ -2,16 +2,16 @@
   "name": "@cdmbase/remix-redis-session",
   "version": "0.2.0",
   "description": "Redis session storage for Remix",
-  "main": "dist/index.js",
+  "main": "dist/index.node.js",
   "type": "module",
-  "typings": "./dist/index.d.ts",
+  "typings": "./dist/index.node.d.ts",
   "files": [
     "dist/**"
   ],
   "scripts": {
     "build": "npx tsc"
   },
-  "author": "Dov Alperin",
+  "author": "Dov Alperin, cdmbase",
   "repository": "https://github.com/DAlperin/remix-redis-session",
   "license": "MIT",
   "devDependencies": {
