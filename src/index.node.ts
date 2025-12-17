@@ -8,19 +8,24 @@ import crypto from "node:crypto";
 import { Redis, RedisOptions } from "ioredis";
 import { expiresToSeconds, formatKey } from "./common.js";
 
+// Re-export ioredis types for consumer convenience
+export type { Redis, RedisOptions } from "ioredis";
+
 // Generates a random session ID using Node's crypto
 function genRandomID(): string {
   const randomBytes = crypto.randomBytes(8);
   return Buffer.from(randomBytes).toString("hex");
 }
 
-type RedisSessionArguments = {
+export type RedisSessionArguments = {
   appName: string;
   cookie: SessionIdStorageStrategy["cookie"];
   options: {
     redisConfig?: RedisOptions;
-    redisClient?: any;
-    // Cloudflare-specific option is not used here.
+    /** 
+     * A pre-configured ioredis client instance.
+     */
+    redisClient?: Redis;
   };
 };
 
@@ -29,7 +34,7 @@ export function createRedisSessionStorage({
   cookie,
   options,
 }: RedisSessionArguments): SessionStorage {
-  let redis: any;
+  let redis: Redis;
   if (options.redisClient) {
     redis = options.redisClient;
   } else if (options.redisConfig) {
@@ -49,10 +54,12 @@ export function createRedisSessionStorage({
       const id = genRandomID();
       const key = formatKey(appName, id);
       if (expires) {
+        // Use ioredis syntax: SET key value EX seconds
         await redis.set(
           key,
           JSON.stringify(data),
-          { ex: expiresToSeconds(expires) }
+          'EX',
+          expiresToSeconds(expires)
         );
       } else {
         await redis.set(key, JSON.stringify(data));
@@ -68,10 +75,12 @@ export function createRedisSessionStorage({
     },
     async updateData(id, data, expires) {
       if (expires) {
+        // Use ioredis syntax: SET key value EX seconds
         await redis.set(
           id,
           JSON.stringify(data),
-          { ex: expiresToSeconds(expires) }
+          'EX',
+          expiresToSeconds(expires)
         );
       } else {
         await redis.set(id, JSON.stringify(data));
