@@ -17,7 +17,6 @@ async function testRedisSetWithExpiry() {
     host: REDIS_HOST,
     port: REDIS_PORT,
     maxRetriesPerRequest: 3,
-    retryDelayOnFailover: 100,
   });
 
   try {
