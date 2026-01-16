@@ -14,6 +14,22 @@ export function expiresToSeconds(expires: Date): number {
 }
 
 /**
+ * Sanitizes a string to be safe for use in Redis keys.
+ * Removes or replaces characters that could cause issues.
+ *
+ * @param str - The string to sanitize.
+ * @returns The sanitized string.
+ */
+function sanitizeKeyComponent(str: string): string {
+  return str
+    .replace(/[\s\r\n\t]+/g, '_') // Replace whitespace with underscores
+    .replace(/\|/g, '-') // Replace pipes with hyphens
+    .replace(/[\x00-\x1F\x7F]/g, '') // Remove control characters
+    .replace(/["'\\]/g, '') // Remove quotes and backslashes
+    .trim();
+}
+
+/**
  * Formats a Redis key based on the application name and id.
  *
  * @param appName - The name of your application.
@@ -21,5 +37,6 @@ export function expiresToSeconds(expires: Date): number {
  * @returns The formatted Redis key.
  */
 export function formatKey(appName: string, id: string): string {
-  return `${appName}:Sessions:${id}`;
+  const sanitizedAppName = sanitizeKeyComponent(appName);
+  return `${sanitizedAppName}:Sessions:${id}`;
 } 

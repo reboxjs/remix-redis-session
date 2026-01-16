@@ -40,6 +40,21 @@ describe('Redis Session Storage - ioredis compatibility', () => {
       const key = formatKey('MyApp', 'abc123');
       expect(key).toBe('MyApp:Sessions:abc123');
     });
+
+    it('should sanitize appName with spaces', () => {
+      const key = formatKey('My App Name', 'abc123');
+      expect(key).toBe('My_App_Name:Sessions:abc123');
+    });
+
+    it('should sanitize appName with special characters', () => {
+      const key = formatKey('My|App\'s "Name"', 'abc123');
+      expect(key).toBe('My-Apps_Name:Sessions:abc123');
+    });
+
+    it('should remove control characters from appName', () => {
+      const key = formatKey('MyApp\x00\x1F', 'abc123');
+      expect(key).toBe('MyApp:Sessions:abc123');
+    });
   });
 
   describe('ioredis SET command syntax', () => {
