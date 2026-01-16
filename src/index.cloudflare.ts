@@ -17,6 +17,8 @@ function genRandomID(): string {
 
 type RedisSessionArguments = {
   appName: string;
+  /** Optional tenant identifier for multi-tenant isolation */
+  tenantId?: string;
   cookie: SessionIdStorageStrategy["cookie"];
   options: {
     // Upstash Redis requires a URL and token for configuration.
@@ -27,6 +29,7 @@ type RedisSessionArguments = {
 
 export function createRedisSessionStorage({
   appName,
+  tenantId,
   cookie,
   options,
 }: RedisSessionArguments): SessionStorage {
@@ -46,7 +49,7 @@ export function createRedisSessionStorage({
     cookie,
     async createData(data, expires) {
       const id = genRandomID();
-      const key = formatKey(appName, id);
+      const key = formatKey(appName, id, tenantId);
       if (expires) {
         await redis.set(
           key,

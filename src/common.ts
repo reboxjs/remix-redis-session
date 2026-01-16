@@ -30,13 +30,18 @@ function sanitizeKeyComponent(str: string): string {
 }
 
 /**
- * Formats a Redis key based on the application name and id.
+ * Formats a Redis key based on the application name, tenant, and id.
  *
  * @param appName - The name of your application.
  * @param id - The session id.
+ * @param tenantId - Optional tenant identifier for multi-tenant isolation.
  * @returns The formatted Redis key.
  */
-export function formatKey(appName: string, id: string): string {
+export function formatKey(appName: string, id: string, tenantId?: string): string {
   const sanitizedAppName = sanitizeKeyComponent(appName);
+  if (tenantId) {
+    const sanitizedTenantId = sanitizeKeyComponent(tenantId);
+    return `${sanitizedAppName}:${sanitizedTenantId}:Sessions:${id}`;
+  }
   return `${sanitizedAppName}:Sessions:${id}`;
 } 

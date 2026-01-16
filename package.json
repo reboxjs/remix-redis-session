@@ -1,6 +1,6 @@
 {
   "name": "@cdmbase/remix-redis-session",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Redis session storage for Remix",
   "main": "dist/index.node.js",
   "type": "module",
