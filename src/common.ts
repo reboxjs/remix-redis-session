@@ -41,7 +41,7 @@ export function formatKey(appName: string, id: string, tenantId?: string): strin
   const sanitizedAppName = sanitizeKeyComponent(appName);
   if (tenantId) {
     const sanitizedTenantId = sanitizeKeyComponent(tenantId);
-    return `${sanitizedAppName}:${sanitizedTenantId}:Sessions:${id}`;
+    return `${sanitizedAppName}:${sanitizedTenantId}:session:${id}`;
   }
-  return `${sanitizedAppName}:Sessions:${id}`;
+  return `${sanitizedAppName}:session:${id}`;
 } 
